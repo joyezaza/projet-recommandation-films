@@ -1734,12 +1734,14 @@ print(f"\n RMSE du modèle Item-Item KNN : {rmse:.3f}")
 ```bash
 PS C:\projet_work\Script> python evaluation_modele_item_item.py
 RMSE du modèle Item-Item KNN : 1.031
-✅ Ces résultats montrent que le modèle Item-Item KNN est plus performant et qu'il capture mieux les relations entre films.
+```
+Ces résultats montrent que le modèle Item-Item KNN est plus performant et qu'il capture mieux les relations entre films.
+
 ## 🔹h. Modèle basé sur le Contenu (Genres) : Création
 
 Le modèle **Content-Based KNN** repose sur l'idée que **des films partageant des caractéristiques similaires (comme les genres) seront appréciés par les mêmes utilisateurs**.  
 En utilisant **KNN (K-Nearest Neighbors)**, nous identifions **les films les plus proches** d’un film donné **en fonction de leurs genres**.
-```
+
 ####  Code : `modele_content_based.py`
 
 ```python
@@ -1875,8 +1877,9 @@ print(f"\n RMSE du modèle Content-Based KNN : {rmse:.3f}")
 ```bash
 PS C:\projet_work\Script> python evaluation_modele_content_based.py
 RMSE du modèle Content-Based KNN : 1.266
-Comparé aux modèles User-User et Item-Item KNN, ce modèle a un RMSE plus élevé, ce qui signifie qu'il est moins précis pour prédire les notes exactes.
 ```
+Comparé aux modèles User-User et Item-Item KNN, ce modèle a un RMSE plus élevé, ce qui signifie qu'il est moins précis pour prédire les notes exactes.
+
 ## 🔹i. Modèle Hybride Content-User : Création
 
 Le modèle **Hybrid Content-User KNN** combine **deux sources d’information** :
