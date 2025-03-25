@@ -878,11 +878,11 @@ _On remarque clairement une augmentation significative du nombre de films à par
 _On retrouve essentiellement des blockbusters (films à très grand succès commercial et populaire) des années 1990 tels que « Star Wars (1977) », « Contact (1997) », et « Fargo (1996) ». Ce graphique est cohérent avec le graphique par année de sortie, qui montre que les films récents attirent le plus d’attention et de notations de la part des utilisateurs._
 
 **3. Top 10 des films les mieux notés**  
-![Top 10 des films les mieux notés](EDA/Top10_films_ mieux_notes.png) 
+![Top 10 des films les mieux notés](EDA/Top10_films_mieux_notes.png) 
 _Les films les mieux notés sont des grands classiques ou films unanimement appréciés, tels que « Wrong Trousers (1993) », « Schindler's List (1993) » et « Casablanca (1942) ». Ce graphique révèle clairement que les utilisateurs notent généralement très hautement les classiques reconnus, indépendamment de leur ancienneté._
 
 **4. Top 10 des films avec le plus de genres**  
-![Top 10 des films avec le plus de genres](EDA/Top10_films_ plus_de_genres.png)  
+![Top 10 des films avec le plus de genres](EDA/Top10_films_plus_de_genres.png)  
 _Des films tels que « Transformers (1986) » et « Empire Strikes Back (1980) » apparaissent en tête avec jusqu'à 6 genres différents. Cela montre une difficulté à classifier précisément ces films dans une seule catégorie et explique aussi leur large audience et leur popularité._
 
 **5. Distribution des films mono-genre vs multi-genres**  
@@ -2681,24 +2681,24 @@ C:\projet_work\Data-source\
 C:\projet_work\Script\
 
 Utilisation du Script Interactif
-1️⃣ Accès au script
+1️- Accès au script
 Ouvrez une invite de commande et naviguez vers le dossier des scripts :
 
 cd C:\projet_work\Script
-2️⃣ Exécution du script
+2️- Exécution du script
 Lancez le script interactif avec :
 python recommandations_interactives.py
-3️⃣ Procédure interactive
+3️- Procédure interactive
 Le script vous demandera d’entrer votre identifiant utilisateur (userId).
 Après saisie d’un userId valide, le système affichera une liste de films recommandés accompagnée de la note prédite pour chacun.
 🌍 Utilisation de l'API Flask
-1️⃣ Lancement de l’API
+1️- Lancement de l’API
 Dans l’invite de commande, naviguez vers le dossier des scripts et exécutez :
 cd C:\projet_work\Script
 python api_recommendations.py
 L'API démarrera sur :
 http://127.0.0.1:5000
-2️⃣ Accès aux recommandations
+2️- Accès aux recommandations
 Vous pouvez utiliser :
 Un navigateur 
 Un outil comme Postman 
@@ -2706,7 +2706,7 @@ Une requête HTTP (curl, requests en Python, etc.)
 L’endpoint à appeler est :
 http://127.0.0.1:5000/recommendations?userId=<votre_userId>
 Remplacez <votre_userId> par votre identifiant numérique.
-3️⃣ Réponse attendue (format JSON)
+3️- Réponse attendue (format JSON)
 L’API retourne une réponse contenant les films recommandés et leurs notes prédites, par exemple :
 {
     "userId": 20,
@@ -2721,6 +2721,8 @@ L’API retourne une réponse contenant les films recommandés et leurs notes pr
 ❓ Support et Assistance
 Pour toute question ou problème rencontré, veuillez consulter la documentation technique ou contacter l’équipe de support à l’adresse suivante :
 📧 joye@support.badou
+
+ # 4️⃣ Le lien Github : https://github.com/joyezaza/projet-recommandation-films.git
 
 ## Conclusion
 
