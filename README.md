@@ -14,7 +14,7 @@
   - Description des données `movie.csv`
   - Description des données `rating.csv`
 - c. Centralisation des données dans un système structuré (HDFS)
-- [II. Phase de Fiabilisation et Normalisation](#ii-phase-de-fiabilisation-et-normalisation)
+- [II. Phase de Fiabilisation et Normalisation](#ii-phase-de-fiabilisation-et-normalisation) 
 - Nettoyage `rating.csv`
 - Nettoyage `movie.csv`
 - Fusion des données
@@ -111,13 +111,17 @@ def convert_u_item_to_csv(input_path, output_path):
 # Exécution des conversions
 convert_u_data_to_csv(u_data_path, ratings_output_path)
 convert_u_item_to_csv(u_item_path, movies_output_path)
+```
+
 
 ▶️ Exécution dans le terminal
+```bash
 
 PS C:\Users\joyeb> cd C:\projet_work\Script
 PS C:\projet_work\Script> python convert_to_csv.py
  Conversion de C:\projet_work\Data-source\u.data en C:\projet_work\Data-source\rating.csv réussie.
  Conversion de C:\projet_work\Data-source\u.item en C:\projet_work\Data-source\movie.csv réussie.
+ ```
 
 ### b. Vérification de la structure des fichiers
 
@@ -167,6 +171,7 @@ print(f"Nombre de dates de sortie manquantes : {num_missing_release_dates}")
 print(f"Nombre de dates de sortie vidéo manquantes : {num_missing_video_dates}\n")
 print("Aperçu des trois premières lignes :")
 print(first_three_rows)
+```
 
 #### ▶️ Exécution dans le terminal
 
@@ -226,7 +231,7 @@ o	Il y a 2 films classés comme unknown.
 o	Les trois premières lignes montrent des exemples de films avec leurs informations de base et leurs genres.
 o	La colonne video_release_date contient des valeurs NaN
 o	Les colonnes de genre contiennent des valeurs binaires (0 ou 1)
-
+```
 Description des données rating.csv
 ####  Code : `analyse_rating.py`
 #### Code : `analyse_rating.py`
@@ -287,6 +292,7 @@ print(ratings[ratings.duplicated(subset='user_id', keep=False)].sort_values('use
 # Aperçu des entrées film en double
 print("Aperçu des entrées film en double :")
 print(ratings[ratings.duplicated(subset='movie_id', keep=False)].sort_values('movie_id').head())
+```
 ```markdown
 #### ▶️ Exécution dans le terminal
 
@@ -323,6 +329,7 @@ Aperçu des entrées film en double :
 21683      256         1       5  882150980
 89335      922         1       5  891448551
 86548      881         1       4  876535796
+```
 
  Analyses des résultats
 
@@ -366,18 +373,25 @@ PS C:\hadoop-3.3.5\sbin> jps
 45240 ResourceManager
 32812 Jps
 42028 DataNode
+```
 ▶️ Chargement des données dans HDFS
+```bash
 PS C:\hadoop-3.3.5\sbin> hdfs dfs -put C:\projet_work\Data-source\merged_final_data.csv /user/joyeb/merged_final_data.csv
+```
 ▶️ Taille et nombre de blocs
+```bash
 PS C:\hadoop-3.3.5\sbin> hdfs dfs -du -h /user/joyeb/merged_final_data.csv
 7.9 M  7.9 M  /user/joyeb/merged_final_data.csv
+```
 ▶️ Vérification de l'intégrité avec FSCK
+```bash
 PS C:\hadoop-3.3.5\sbin> hdfs fsck /user/joyeb/merged_final_data.csv -files -blocks -locations
 Status: HEALTHY
 Total size: 8247603 B (≈7.9 MB)
 Total blocks: 1 (avg. block size 8247603 B)
 Replicated blocks: 1 (replication factor: 1)
 Missing/Corrupt blocks: 0
+```
  Bref commentaire :
 Le rapport montre que le fichier /user/joyeb/merged_final_data.csv occupe environ 7,9 Mo dans HDFS.
 Il a été stocké dans un unique bloc, avec une réplication minimale (1).
@@ -392,7 +406,7 @@ Dans cette phase nous allons en gros nettoyer les données.
 
 - **Supprimer les lignes entièrement doublées :**  
   - Identifier et éliminer les enregistrements identiques dans le jeu de données.  
-  - ⚠️ Pourquoi ? Les doublons faussent les analyses et les résultats du modèle.
+  -  Pourquoi ? Les doublons faussent les analyses et les résultats du modèle.
 
 - **Supprimer la colonne `timestamp` :**  
   - Retirer cette colonne car elle n’est pas utilisée dans l’analyse.
@@ -404,7 +418,7 @@ Dans cette phase nous allons en gros nettoyer les données.
   - Ces utilisateurs n’ont pas un profil suffisant pour une recommandation personnalisée.
 
 - **Supprimer les utilisateurs ayant noté un nombre anormalement élevé de films (au-dessus du 99e percentile) :**  
-  - ⚠️ Pourquoi ? Ce sont potentiellement des comportements extrêmes ou des anomalies.
+  -  Pourquoi ? Ce sont potentiellement des comportements extrêmes ou des anomalies.
 
 - **Supprimer les utilisateurs avec une variance des notes < 0.1 :**  
   - Ces utilisateurs notent tous les films pareil → aucune personnalisation utile.
@@ -474,6 +488,7 @@ ratings_clean['rating_normalized'] = (ratings_clean['rating'] - min_rating) / (m
 
 # Sauvegarde
 ratings_clean.to_csv(r'C:\projet_work\Data-source\clean_rating.csv', index=False)
+```
 
 #### ▶️ Exécution du script `clean_ratings.py`
 
@@ -493,33 +508,19 @@ Aperçu des 3 premières lignes après nettoyage :
 0      196       242       3                0.5
 1      186       302       3                0.5
 2       22       377       1                0.0
-
+```
 ### Nettoyage de movie.csv
 
 Nous allons procéder aux traitements suivants :
-
 Supprimer les colonnes : video_release_date, unknown, IMDb_URL
-
 Action : Retirer les colonnes contenant des informations superflues ou inutiles pour l'analyse.
-
-Pourquoi :
-
-video_release_date est entièrement remplie de valeurs manquantes (NaN)
-
+Pourquoi : video_release_date est entièrement remplie de valeurs manquantes (NaN)
 unknown correspond à un genre peu représenté et non significatif
-
 IMDb_URL n’est pas utile dans le cadre de ce projet
-
 Supprimer les lignes entièrement dupliquées en gardant une seule occurrence :
-
 Action : Identifier et éliminer les lignes identiques
-
-Pourquoi :
-
-Les doublons faussent les statistiques
-
+Pourquoi :Les doublons faussent les statistiques
 Cela garantit que chaque film est unique dans le jeu de données
-
 #### Code : `clean_movies.py`
 
 ```python
@@ -547,7 +548,9 @@ print(movies_clean.head(3))
 
 # Sauvegarde
 movies_clean.to_csv(r'C:\projet_work\Data-source\movie_clean.csv', index=False)
+```
 ▶️ Exécution du script clean_movies.py
+```bash
 PS C:\projet_work\Script> python clean_movies.py
 Nombre de lignes après nettoyage : 1681
 Aperçu des 3 premières lignes après nettoyage :
@@ -557,23 +560,17 @@ Aperçu des 3 premières lignes après nettoyage :
 2         3  Four Rooms (1995)  01-Jan-1995       0          0          0           0  ...        0        0        0       0         1    0        0
 
 [3 rows x 21 columns]
+```
 
 ### Fusion des données nettoyées
 
 Nous allons maintenant procéder à la fusion des données nettoyées.
-
 Dans les 3 scripts ci-dessus, nous allons :
-
 Fusionner les données nettoyées
-
 Vérifier les movie_id dans ratings non présents dans movies afin de s’assurer que toutes les notes se rapportent à des films existants
-
 Vérifier les movie_id dans movies non présents dans ratings afin d’identifier les films qui n'ont reçu aucune note
-
 Retirer les lignes du fichier ratings avec des movie_id inexistants dans movies
-
 Nettoyer le fichier movies en supprimant les films non notés
-
 Fusionner les deux fichiers nettoyés ratings_clean et movie_clean sur la colonne movie_id
 
 #### Code : `fusion_donnees.py`
@@ -608,6 +605,7 @@ Aperçu des 3 premières lignes après fusion :
 2       22       377       1                0.0       Heavyweights (1994)  01-Jan-1994  ...        0        0       0         0    0        0
 
 [3 rows x 24 columns]
+```
 
 #### Code : `verification.py`
 
@@ -635,6 +633,7 @@ print(f"\nNombre de movie_id présents dans movies mais absents dans ratings : {
 # Afficher ces movie_id sans correspondance dans ratings
 print("\nListe des movie_id présents dans movies mais absents dans ratings :")
 print(movies_not_in_ratings['movie_id'].unique())
+```
 
 ####  Code : `nettoyage_et_fusion_finale.py`
 
@@ -666,9 +665,10 @@ merged_final_data = pd.merge(ratings_final, movies_final, on='movie_id', how='in
 print(f"Nombre total de lignes après fusion : {merged_final_data.shape[0]}\n")
 print("Aperçu des 3 premières lignes fusionnées :")
 print(merged_final_data.head(3))
-
+```
 # Sauvegarde définitive
 ▶️ Exécution du script nettoyage_et_fusion_finale.py
+```bash
 PS C:\projet_work\Script> python nettoyage_et_fusion_finale.py
 Lignes supprimées de ratings (movie_id sans correspondance) : 9
 Films supprimés dans movies (aucune notation associée) : 221
@@ -682,9 +682,8 @@ Aperçu des 3 premières lignes fusionnées :
 2       22       377       1                0.0       Heavyweights (1994)  01-Jan-1994  ...        0        0       0         0    0        0
 
 [3 rows x 24 columns]
+```
 
-
-```markdown
 
 ## III. Phase d’Analyse Exploratoire
 
@@ -789,12 +788,9 @@ plt.title('Distribution des films mono-genre vs multi-genres')
 plt.ylabel('')
 plt.tight_layout()
 plt.show()
-
-
-```markdown
+```
 #### ▶️ Résultats utiles du script `analyse_films.py`
 
-```text
 Nombre total de films : 1460
 
 Répartition des films par année (10 premières lignes) :
@@ -849,7 +845,6 @@ Distribution mono-genre vs multi-genres :
 Multi-genres : 781  
 Mono-genre   : 679
 
-```markdown
 #####  Analyse brève des résultats
 
 - Le dataset comporte un total de **1460 films uniques** après nettoyage.
@@ -983,9 +978,9 @@ plt.xlabel('Catégorie de film')
 plt.xticks(rotation=0)
 plt.tight_layout()
 plt.show()
+```
 #### ▶️ Résultats utiles du script `analyse_notes.py`
 
-```text
 Nombre total de notes dans la base : 94276
 
 Statistiques descriptives des notes :
@@ -1027,7 +1022,7 @@ Récent (>=1980)    3.478773
 ![Notes moyennes par année](EDA/notes_moyennes_par_annee.png) 
 
 **4. Note moyenne : films anciens vs récents**  
-![Ancien vs récent](EDA/films_anciens_vs_recents.png) films_anciens_vs_recents.png
+![Ancien vs récent](EDA/films_anciens_vs_recents.png) 
 ###  Synthèse des résultats et graphiques (`analyse_notes.py`)
 
 **Nombre total et distribution des notes :**
@@ -1134,10 +1129,9 @@ sns.heatmap(correlation_genres, annot=True, cmap='coolwarm', linewidths=0.5)
 plt.title('Heatmap des corrélations entre genres')
 plt.tight_layout()
 plt.show()
-
+```
 #### ▶️ Résultats du script `analyse_genres.py`
-
-```text
+```bash
 Nombre de films par genre :
 Drama          608
 Comedy         456
@@ -1198,7 +1192,7 @@ Animation  -0.101185  -0.026709   1.000000    0.558514  0.032727 -0.057732  ... 
 Children's -0.147025   0.096590   0.558514    1.000000  0.086271 -0.082387  ... -0.055738 -0.119693 -0.044201 -0.144973 -0.086481 -0.031909
 Comedy     -0.225300  -0.112925   0.032727    0.086271  1.000000 -0.091057  ... -0.112975  0.094760 -0.146919 -0.292629 -0.121855  0.002660
 ...
-
+```
 #### Graphiques produits
 
 **1. Nombre de films par genre**  
@@ -1301,16 +1295,12 @@ plt.xlabel('Variance des notes')
 plt.ylabel('Nombre d\'utilisateurs')
 plt.tight_layout()
 plt.show()
-
----
+```
 
 ####  Résultats utiles du script `analyse_utilisateurs.py`
-
-```text
+```bash
 Nombre total d'utilisateurs : 933
-
 Nombre moyen de notes par utilisateur : 101.05
-
 Top 10 utilisateurs les plus actifs :
 user_id
 279    424
@@ -1337,6 +1327,7 @@ user_id
 8        3.796610  1.544126
 9        4.272727  0.874459
 10       4.207650  0.341260
+```
 ####  Graphiques produits
 
 **1. Top 10 des utilisateurs ayant attribué le plus de notes**  
@@ -1371,7 +1362,7 @@ user_id
 - Peu d’utilisateurs sont **extrêmement constants (faible variance)** ou **extrêmement variés dans leurs notes (haute variance)**.
 
 ---
-## 📌 Conclusion
+## Conclusion
 
 Les résultats obtenus à travers l’analyse exploratoire confirment clairement la pertinence des hypothèses formulées :
 
@@ -1469,6 +1460,7 @@ user_item_matrix = data.pivot_table(index='user_id', columns='movie_title', valu
 user_item_matrix.to_csv(r'C:\projet_work\Data-source\user_item_matrix.csv')
 
 print("Matrice User-Item créée avec succès.")
+```
 
 ## 🔹 g. Implémentation de KNN pour le Filtrage Collaboratif
 
@@ -1529,8 +1521,7 @@ recommandations = recommander_films(user_id, user_item_matrix, model_knn, n_reco
 print("\nModèle User-User KNN créé avec succès")
 print(f"Recommandations finales pour l'utilisateur {user_id} :")
 print(recommandations)
-
----
+```
 
 #### ▶️ Résultats de l’exécution
 
@@ -1545,14 +1536,14 @@ E.T. the Extra-Terrestrial (1982)                                              3
 Dave (1993)                                                                    3.3
 Stand by Me (1986)                                                             3.3
 dtype: float64
-
+```
 Bref commentaire :
 Le modèle User-User KNN a été créé avec succès et a fourni un exemple concret de recommandations pour l'utilisateur 1, illustrant son fonctionnement et sa capacité à identifier des préférences basées sur les utilisateurs similaires.
 ## 🔹 Modèle User-User : Évaluation
 
 Après l'entraînement du modèle **User-User KNN**, il est essentiel d’évaluer sa précision en mesurant **l’erreur de prédiction** sur un ensemble de test.
 
-📌 **Métrique utilisée :**  
+**Métrique utilisée :**  
 ➡️ **RMSE (Root Mean Squared Error)** : Cette métrique mesure **l’écart moyen** entre les notes prédites et les notes réelles.  
 Plus la **valeur du RMSE est faible**, plus le modèle est précis.
 
@@ -1611,14 +1602,14 @@ mse = mean_squared_error(truths, predictions)
 rmse = np.sqrt(mse)
 
 print(f"\n RMSE du modèle User-User KNN : {rmse:.3f}")
-
----
+```
 
 #### ▶️ Résultats de l’exécution
 
 ```bash
 PS C:\projet_work\Script> python evaluation_modele_user_user.py
 RMSE du modèle User-User KNN : 1.112
+```
 ## 🔹 Modèle Item-Item : Création
 
 Le modèle **Item-Item KNN** repose sur l'idée que **des films similaires sont souvent appréciés par les mêmes utilisateurs**.  
@@ -1666,8 +1657,7 @@ recommandations = recommander_films_similaires(titre_film, item_user_matrix, mod
 print("\nModèle Item-Item KNN créé avec succès")
 print(f"\n🎬 Films similaires recommandés pour '{titre_film}':")
 print(recommandations)
-
----
+```
 
 #### ▶️ Résultats de l’exécution
 
@@ -1680,6 +1670,7 @@ Index(['Return of the Jedi (1983)', 'Raiders of the Lost Ark (1981)',
        'Empire Strikes Back, The (1980)', 'Toy Story (1995)',
        'Godfather, The (1972)'],
       dtype='object', name='movie_title')
+```
 Bref commentaire :
 Le modèle Item-Item KNN a été créé avec succès et a fourni un exemple concret de recommandations pour "Star Wars (1977)", incluant notamment "Return of the Jedi (1983)", "Raiders of the Lost Ark (1981)", "Empire Strikes Back, The (1980)", "Toy Story (1995)" et "Godfather, The (1972)".
 ## 🔹 Modèle Item-Item : Évaluation
@@ -1737,9 +1728,7 @@ mse = mean_squared_error(truths, predictions)
 rmse = np.sqrt(mse)
 
 print(f"\n RMSE du modèle Item-Item KNN : {rmse:.3f}")
-
----
-
+```
 #### ▶️ Résultats de l’exécution
 
 ```bash
@@ -1750,9 +1739,7 @@ RMSE du modèle Item-Item KNN : 1.031
 
 Le modèle **Content-Based KNN** repose sur l'idée que **des films partageant des caractéristiques similaires (comme les genres) seront appréciés par les mêmes utilisateurs**.  
 En utilisant **KNN (K-Nearest Neighbors)**, nous identifions **les films les plus proches** d’un film donné **en fonction de leurs genres**.
-
----
-
+```
 ####  Code : `modele_content_based.py`
 
 ```python
@@ -1797,9 +1784,7 @@ recommandations = recommander_films_par_genres(titre_film, movie_genres_matrix, 
 print("\nModèle Content_based_recommandation créé avec succès")
 print(f"\n🎬 Films similaires recommandés à '{titre_film}' (Content-Based) :")
 print(recommandations)
-
----
-
+```
 #### ▶️ Résultats de l’exécution
 
 ```bash
@@ -1810,6 +1795,7 @@ Index(['Return of the Jedi (1983)', 'Empire Strikes Back, The (1980)',
        'African Queen, The (1951)', 'Starship Troopers (1997)',
        'Star Trek V: The Final Frontier (1989)'],
       dtype='object', name='movie_title')
+```
 Bref commentaire :
 Le modèle Content-Based KNN a été créé avec succès.
 Pour "Star Wars (1977)", il recommande des films partageant des caractéristiques de contenu similaires, tels que :
@@ -1819,12 +1805,9 @@ Pour "Star Wars (1977)", il recommande des films partageant des caractéristique
 ## 🔹 Modèle basé sur le Contenu (Genres) : Évaluation
 
 Après l'entraînement du modèle **Content-Based KNN**, il est essentiel d’évaluer sa précision en mesurant **l’erreur de prédiction** sur un ensemble de test.
-
-📌 **Métrique utilisée :**  
+ **Métrique utilisée :**  
 ➡️ **RMSE (Root Mean Squared Error)** : Cette métrique mesure **l’écart moyen** entre les notes prédites et les notes réelles.  
 Plus la **valeur du RMSE est faible**, plus le modèle est précis.
-
----
 
 #### Code : `evaluation_modele_content_based.py`
 
@@ -1885,8 +1868,7 @@ for user_id, film, true_rating in test_data[['user_id', 'movie_title', 'rating']
 rmse = np.sqrt(mean_squared_error(truths, predictions))
 
 print(f"\n RMSE du modèle Content-Based KNN : {rmse:.3f}")
-
----
+```
 
 #### ▶️ Résultats de l’exécution
 
@@ -1894,13 +1876,14 @@ print(f"\n RMSE du modèle Content-Based KNN : {rmse:.3f}")
 PS C:\projet_work\Script> python evaluation_modele_content_based.py
 RMSE du modèle Content-Based KNN : 1.266
 Comparé aux modèles User-User et Item-Item KNN, ce modèle a un RMSE plus élevé, ce qui signifie qu'il est moins précis pour prédire les notes exactes.
+```
 ## 🔹i. Modèle Hybride Content-User : Création
 
 Le modèle **Hybrid Content-User KNN** combine **deux sources d’information** :
 - 🔹 **Les similarités entre films (Content-Based)** : En se basant sur les **genres** pour identifier des films similaires.
 - 🔹 **Les similarités entre utilisateurs (User-User)** : En trouvant des **utilisateurs proches ayant des goûts similaires**.
 
-📌 **Objectif :** Améliorer la pertinence des recommandations en **fusionnant les préférences des utilisateurs avec la similarité des films**.
+**Objectif :** Améliorer la pertinence des recommandations en **fusionnant les préférences des utilisateurs avec la similarité des films**.
 
 ---
 
@@ -1967,8 +1950,7 @@ recommandations = recommander_films_hybride(user_id, titre_film, user_item_matri
 print("\nModèle Hybrid-Content-user recommandation créé avec succès")
 print(f"\n Films recommandés à l'utilisateur {user_id} en hybride avec '{titre_film}':")
 print(recommandations)
-
----
+```
 
 #### ▶️ Résultats de l’exécution
 
@@ -1984,7 +1966,7 @@ Jurassic Park (1993)               3.666667
 Star Trek: Generations (1994)      2.222222
 Stargate (1994)                    2.111111
 dtype: float64
-
+```
 Bref commentaire :
 Le modèle Hybrid-Content-User KNN a été créé avec succès, fournissant pour l'utilisateur 1 des recommandations basées sur une combinaison des similarités de contenu et des préférences utilisateurs.
 Les résultats, incluant des titres comme "Empire Strikes Back, The (1980)" et "Return of the Jedi (1983)", démontrent la capacité du modèle à fusionner efficacement ces deux approches.
@@ -1993,7 +1975,7 @@ Les résultats, incluant des titres comme "Empire Strikes Back, The (1980)" et "
 
 Après l'entraînement du modèle **Hybrid Content-User KNN**, il est essentiel d’évaluer sa précision en mesurant **l’erreur de prédiction** sur un ensemble de test.
 
-📌 **Métrique utilisée :**  
+**Métrique utilisée :**  
 ➡️ **RMSE (Root Mean Squared Error)** : Cette métrique mesure **l’écart moyen** entre les notes prédites et les notes réelles.  
 Plus la **valeur du RMSE est faible**, plus le modèle est précis.
 
@@ -2064,22 +2046,23 @@ for user_id, film, true_rating in test_data[['user_id', 'movie_title', 'rating']
 # Calcul du RMSE
 rmse = np.sqrt(mean_squared_error(truths, predictions))
 print(f"\n RMSE du modèle Hybrid Content-User KNN : {rmse:.3f}")
-
----
+```
 
 #### ▶️ Résultats de l’exécution
 
 ```bash
 PS C:\projet_work\Script> python evaluation_modele_hybrid_content_user.py
 RMSE du modèle Hybrid Content-User KNN : 3.115
+```
 l’écart moyen entre les notes prédites par le modèle et les notes réelles est assez élevé, ce qui suggère que ce modèle hybride n'est pas aussi précis que les autres modèles testés.
+
 ## 🔹 Modèle Hybride Content-Item : Création
 
 Le modèle **Hybrid Content-Item KNN** combine **deux types de similarités** :
 - 🔹 **Les similarités de contenu (Content-Based)** : En comparant les **genres** des films.
 - 🔹 **Les similarités de notation des utilisateurs (Item-Item Collaborative Filtering)** : En identifiant **les films notés de manière similaire**.
 
-📌 **Objectif :** Améliorer la précision des recommandations en combinant **deux sources d'information** pour identifier des films pertinents.
+**Objectif :** Améliorer la précision des recommandations en combinant **deux sources d'information** pour identifier des films pertinents.
 
 ---
 
@@ -2153,8 +2136,7 @@ recommandations = recommander_films_hybride_item(titre_film, item_user_matrix, m
 print("\nModèle Hybrid-Content-Item recommandation créé avec succès")
 print(f"\n Films recommandés avec le modèle hybride Content-Item pour '{titre_film}':")
 print(recommandations)
-
----
+```
 
 #### ▶️ Résultats de l’exécution
 
@@ -2167,7 +2149,7 @@ Modèle Hybrid-Content-Item recommandation créé avec succès
 
  Films recommandés avec le modèle hybride Content-Item pour 'Star Wars (1977)':
 ['Raiders of the Lost Ark (1981)', 'Empire Strikes Back, The (1980)', 'Starship Troopers (1997)', 'Stargate (1994)', 'Independence Day (ID4) (1996)']
-
+```
 Bref commentaire :
 Le modèle Hybrid-Content-Item KNN a été créé avec succès, combinant la similarité basée sur le contenu et celle fondée sur les notations collaboratives.
 Pour "Star Wars (1977)", les recommandations obtenues, telles que "Raiders of the Lost Ark (1981)" et "Empire Strikes Back, The (1980)", démontrent la capacité du modèle à identifier des films aux caractéristiques et à l'audience similaires.
@@ -2176,7 +2158,7 @@ Pour "Star Wars (1977)", les recommandations obtenues, telles que "Raiders of th
 
 Après l'entraînement du modèle **Hybrid Content-Item KNN**, il est essentiel d’évaluer sa précision en mesurant **l’erreur de prédiction** sur un ensemble de test.
 
-📌 **Métrique utilisée :**  
+**Métrique utilisée :**  
 ➡️ **RMSE (Root Mean Squared Error)** : Cette métrique mesure **l’écart moyen** entre les notes prédites et les notes réelles.  
 Plus la **valeur du RMSE est faible**, plus le modèle est précis.
 
@@ -2248,15 +2230,14 @@ for film, user_id, true_rating in test_data[['movie_title', 'user_id', 'rating']
 # Calcul du RMSE
 rmse = np.sqrt(mean_squared_error(truths, predictions))
 print(f"\n RMSE du modèle Hybrid Content-Item KNN : {rmse:.3f}")
-
----
+```
 
 #### ▶️ Résultats de l’exécution
 
 ```bash
 PS C:\projet_work\Script> python evaluation_modele_hybrid_content_item.py
  RMSE du modèle Hybrid Content-Item KNN : 2.370
-
+```
  Resumé
 Modèle	RMSE
 User-User KNN	1.112
@@ -2376,8 +2357,7 @@ if best_params:
     print(f" RMSE optimisé : {best_rmse:.3f}")
 else:
     print("\n❌ Aucune combinaison d'hyperparamètres n'a donné un RMSE valide.")
-
----
+```
 
 #### ▶️ Résultats de l’exécution
 
@@ -2397,24 +2377,25 @@ RMSE pour cette configuration : 0.496
  Meilleurs hyperparamètres trouvés pour Item-Item KNN :
  {'n_neighbors': 10, 'metric': 'manhattan', 'algorithm': 'ball_tree'}
  RMSE optimisé : 0.496
+ ```
 
 ## 🔹 Optimisation des hyperparamètres pour le modèle Hybrid Content-Item KNN
 
 Nous allons **ajuster automatiquement les hyperparamètres** pour trouver les **meilleures valeurs** et améliorer les performances du modèle **Hybrid Content-Item KNN**.
 
-📌 **Hyperparamètres optimisés :**
+**Hyperparamètres optimisés :**
 1. **n_neighbors** → Le nombre de voisins pris en compte dans la recommandation (**2, 5, 10**).
 2. **metric** → La mesure de distance utilisée (**cosine, euclidean, manhattan**).
 3. **algorithm** → Algorithmes influençant la vitesse d'exécution (**brute, ball_tree, kd_tree**).
 
-📌 **Modèle optimisé :**
+ **Modèle optimisé :**
 - **Hybrid Content-Item KNN** (**RMSE initial : 2.370**)
 
 ---
 
 ### 🔹 Modèle Hybrid Content-Item KNN : Optimisation
 
-#### 💻 Code : `optimisation_hybrid_content_item.py`
+#### Code : `optimisation_hybrid_content_item.py`
 
 ```python
 import pandas as pd
@@ -2511,8 +2492,7 @@ if best_params:
     print(f" RMSE optimisé : {best_rmse:.3f}")
 else:
     print("\n❌ Aucune combinaison d'hyperparamètres n'a donné un RMSE valide.")
-
----
+```
 
 #### ▶️ Résultats de l’exécution
 
@@ -2522,6 +2502,7 @@ PS C:\projet_work\Script> python optimisation_hybrid_content_item.py
 {'content': {'n_neighbors': 2, 'metric': 'cosine', 'algorithm': 'brute'},
  'item': {'n_neighbors': 2, 'metric': 'euclidean', 'algorithm': 'ball_tree'}}
  RMSE optimisé : 3.222
+ ```
 ##  Bref commentaire et choix du modèle définitif
 
 Après avoir testé et optimisé plusieurs modèles de recommandation basés sur **KNN**, nous avons observé des performances variées selon les approches :
@@ -2546,7 +2527,7 @@ L’objectif est de fournir **une interface intuitive et efficace** pour que **t
 
 ---
 
-## 📌 1️⃣ Script Python interactif - Recommandations en temps réel
+##  1️⃣ Script Python interactif - Recommandations en temps réel
 
 L'utilisateur **saisit son `userId`** et le système **renvoie ses recommandations de films**, en utilisant le **modèle Item-Item KNN** optimisé.
 
@@ -2615,10 +2596,7 @@ recommendations = get_recommendations(user_id, user_item_matrix, knn, top_n=5)
 print(f"\n🎬 Recommandations pour l'utilisateur {user_id}:")
 for movie, score in recommendations:
     print(f"{movie}: note prédite {score:.2f}")
-
-
----
-
+```
 ### ▶️ **Exemple d’exécution du script**
 
 ```bash
@@ -2631,7 +2609,7 @@ Mr. Holland's Opus (1995): note prédite 5.00
 Pulp Fiction (1994): note prédite 4.60
 12 Angry Men (1957): note prédite 4.50
 Fargo (1996): note prédite 4.50
-
+```
 ### 📝 Bref commentaire
 
 Ce résultat démontre le **fonctionnement interactif du système de recommandation** :
@@ -2645,7 +2623,7 @@ Ce résultat démontre le **fonctionnement interactif du système de recommandat
 
 Afin de permettre **une intégration facile** du système de recommandation dans d’autres applications, une **API RESTful** a été développée en utilisant **Flask**.
 
-📌 **Fonctionnalités de l’API :**
+**Fonctionnalités de l’API :**
 - ✅ **Obtenir des recommandations** en envoyant une requête HTTP avec un `userId`.
 - ✅ **Retourne une liste de films recommandés** en format **JSON**.
 - ✅ **Facilement intégrable** dans d'autres applications (web, mobile, etc.).
@@ -2664,7 +2642,8 @@ WARNING: This is a development server. Do not use it in a production deployment.
 Press CTRL+C to quit
 
 http://127.0.0.1:5000/recommendations?userId=20
-### 📸 **Aperçu de l’API en action**
+```
+### **Aperçu de l’API en action**
 Voici un **exemple visuel** de l'API fonctionnant dans un navigateur pour userId=20 :  
 
 ![API Screenshot](EDA/Api.png)
@@ -2674,9 +2653,9 @@ Voici un **exemple visuel** de l'API fonctionnant dans un navigateur pour userId
 - ✅ **La requête avec `userId=20`** a abouti à un **code `200`** et a retourné **un ensemble de films recommandés**, chacun accompagné de sa **note prédite**.
 - ✅ **Sur le navigateur**, l’affichage confirme la **bonne intégration de l’API**, fournissant une **réponse structurée et lisible** pour l’utilisateur.
 
-# 3️⃣ 📖 Guide d'Utilisation du Système de Recommandation de Films
+# 3️⃣ Guide d'Utilisation du Système de Recommandation de Films
 
-## 📌 Introduction
+## Introduction
 Ce système de recommandation de films vous permet d'obtenir des **suggestions personnalisées** basées sur vos préférences.  
 
 Vous disposez de **deux outils principaux** :
@@ -2692,6 +2671,7 @@ Avant d'utiliser ce système, assurez-vous d’avoir **l’environnement et les 
 ✔️ **Dépendances** : Installez les packages suivants avec `pip` :  
    ```bash
    pip install flask pandas numpy scikit-learn
+   ```
 
 ✔️ Données : Placez les fichiers movies.csv et ratings.csv (ou merged_final_data.csv) dans le dossier :
 
@@ -2700,7 +2680,7 @@ C:\projet_work\Data-source\
 
 C:\projet_work\Script\
 
-🖥️ Utilisation du Script Interactif
+Utilisation du Script Interactif
 1️⃣ Accès au script
 Ouvrez une invite de commande et naviguez vers le dossier des scripts :
 
@@ -2720,8 +2700,8 @@ L'API démarrera sur :
 http://127.0.0.1:5000
 2️⃣ Accès aux recommandations
 Vous pouvez utiliser :
-Un navigateur 🖥️
-Un outil comme Postman 🛠️
+Un navigateur 
+Un outil comme Postman 
 Une requête HTTP (curl, requests en Python, etc.)
 L’endpoint à appeler est :
 http://127.0.0.1:5000/recommendations?userId=<votre_userId>
@@ -2742,7 +2722,7 @@ L’API retourne une réponse contenant les films recommandés et leurs notes pr
 Pour toute question ou problème rencontré, veuillez consulter la documentation technique ou contacter l’équipe de support à l’adresse suivante :
 📧 joye@support.badou
 
-## 🎬 Conclusion
+## Conclusion
 
 En conclusion, ce projet a démontré que la **mise en place d’un système de recommandation de films** est non seulement **faisable**, mais également **efficace** lorsqu’on exploite un jeu de données **soigneusement préparé et analysé**.  
 
@@ -2751,14 +2731,14 @@ Dès la phase initiale :
 - ✅ **Fiabilisation et normalisation rigoureuses**, garantissant une base solide pour l’analyse.
 - ✅ **Analyse exploratoire**, permettant de comprendre les comportements des utilisateurs et d’identifier les tendances globales.
 
-### 📌 Hypothèses confirmées :
+### Hypothèses confirmées :
 ✔️ **Les utilisateurs ayant des notations similaires partagent des goûts proches.**  
 ✔️ **Les genres sont un indicateur fiable pour évaluer la similarité entre films.**  
 ✔️ **Les tendances globales des notations guident efficacement les recommandations.**  
 
 ---
 
-### 🚀 Développement et choix du modèle
+###  Développement et choix du modèle
 Sur la base de ces constats, plusieurs **modèles de recommandation** ont été développés en utilisant **KNN** :
 - **User-User KNN**
 - **Item-Item KNN**
@@ -2766,26 +2746,26 @@ Sur la base de ces constats, plusieurs **modèles de recommandation** ont été 
 - **Hybrid Content-User KNN**
 - **Hybrid Content-Item KNN**
 
-📌 **Après tests et optimisation des hyperparamètres** :
+ **Après tests et optimisation des hyperparamètres** :
 ✅ **Le modèle Item-Item KNN** s’est révélé **le plus performant**, offrant **le meilleur RMSE**.  
 ✅ **Son approche exploite efficacement les similarités entre films** pour prédire les préférences des utilisateurs.  
 
 ---
 
-### 🖥️ Accessibilité et Déploiement  
+###  Accessibilité et Déploiement  
 Le projet a été rendu **accessible en temps réel** grâce à :
-- 📌 **Un script interactif Python** (`recommandations_interactives.py`).
-- 📌 **Une API RESTful Flask**, permettant **une intégration facile dans d’autres applications**.
+-  **Un script interactif Python** (`recommandations_interactives.py`).
+- **Une API RESTful Flask**, permettant **une intégration facile dans d’autres applications**.
 
 ---
 
-### 🔮 Perspectives et améliorations futures  
+###  Perspectives et améliorations futures  
 Ce travail démontre **l’efficacité du filtrage collaboratif**, mais ouvre aussi la voie à des **optimisations** :
 - 🔹 **Explorer des modèles hybrides avancés** (ex: combinaisons pondérées, deep learning).
 - 🔹 **Intégrer du Machine Learning supervisé** pour affiner les recommandations.
 - 🔹 **Exploiter davantage les métadonnées des films** (ex: synopsis, acteurs, réalisateurs).
 
-🎯 **Ce projet offre une solution complète et fonctionnelle** pour améliorer **l’expérience utilisateur** dans la découverte de films, tout en posant les bases pour des **améliorations futures**.
+**Ce projet offre une solution complète et fonctionnelle** pour améliorer **l’expérience utilisateur** dans la découverte de films, tout en posant les bases pour des **améliorations futures**.
 
 ---
 
