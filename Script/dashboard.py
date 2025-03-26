@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.neighbors import NearestNeighbors
 import numpy as np
-import os
 
 # 🎨 Configuration du Dashboard
 st.set_page_config(page_title="Dashboard Recommandation de Films", layout="wide")
@@ -19,48 +18,84 @@ else:
     st.error(f"❌ Fichier introuvable : `{DATA_PATH}`. Vérifiez votre dépôt GitHub.")
     st.stop()
 
-# 📌1️⃣ Introduction & Objectifs
-st.title("🎬 Dashboard - Système de Recommandation de Films")
-st.markdown("""
-### 🔹 **Objectifs du Projet**
-Ce projet vise à **analyser** et **modéliser** un **système de recommandation de films** basé sur les notations des utilisateurs.  
-L'objectif est de fournir des **recommandations personnalisées** en fonction des préférences des utilisateurs.
-
-### 🔍 **Données utilisées**
-Nous exploitons le dataset **MovieLens 100K**, contenant **100 000 notations** de **943 utilisateurs** sur **1 682 films**.
-
-### 🔎 **Méthodes utilisées**
-- **Analyse Exploratoire** : Étudier les tendances des notes et des films.
-- **Modèles de Recommandation** : Filtrage **User-User KNN**, **Item-Item KNN**, et **Content-Based**.
-- **Comparaison des performances** des modèles via **le RMSE**.
-""")
-
-# 📊 Navigation Sidebar
+# 📌 **Barre de Navigation**
 st.sidebar.title("🔍 Navigation")
-section = st.sidebar.radio("📌 Choisissez une section :", ["📊 Analyse Exploratoire", "🎬 Recommandations", "📈 Performance des Modèles"])
+page = st.sidebar.radio("📌 Choisissez une section :", [
+    "🏠 Accueil & Objectifs",
+    "📊 Présentation des Données",
+    "🛠 Nettoyage des Données",
+    "📈 Analyse Exploratoire",
+    "🎬 Recommandations",
+    "🚀 Performance des Modèles"
+])
 
-# 📊 2️⃣ Analyse Exploratoire
-if section == "📊 Analyse Exploratoire":
-    st.header("📊 Analyse Exploratoire des Données")
+# 🏠 **1️⃣ Accueil & Objectifs**
+if page == "🏠 Accueil & Objectifs":
+    st.title("🎬 Dashboard - Système de Recommandation de Films")
+    
+    st.markdown("""
+    ### 🔹 **Objectifs du Projet**
+    Ce projet vise à **analyser** et **modéliser** un **système de recommandation de films** basé sur les notations des utilisateurs.  
+    L'objectif est de fournir des **recommandations personnalisées** en fonction des préférences des utilisateurs.
 
-    # 📂 **Descriptif des Données**
-    with st.expander("📌 **Descriptif des Données**"):
-        st.write("**Aperçu des données :**")
-        st.dataframe(df.head(5))
+    ### 🔍 **Données utilisées**
+    - **MovieLens 100K** : **100 000 notations**, **943 utilisateurs**, **1 682 films**.
 
-        st.write("**Informations sur les colonnes :**")
-        st.text(df.info())
+    ### 🔎 **Méthodes utilisées**
+    - **Analyse Exploratoire** : Étudier les tendances des notes et des films.
+    - **Modèles de Recommandation** : Filtrage **User-User KNN**, **Item-Item KNN**, et **Content-Based**.
+    - **Comparaison des performances** des modèles via **le RMSE**.
+    """)
 
-        st.write("**Valeurs manquantes par colonne :**")
-        st.write(df.isnull().sum())
+# 📊 **2️⃣ Présentation des Données**
+elif page == "📊 Présentation des Données":
+    st.header("📊 Présentation des Données")
 
-    # 📊 **Visualisation des Données**
-    tab1, tab2, tab3, tab4 = st.tabs([
-        "🔢 Distribution des Notes", 
-        "📅 Films par Année", 
-        "📌 Genres & Tendances",
-        "👤 Activité des Utilisateurs"
-    ])
+    with st.expander("📌 **Données Movies**"):
+        st.write("**Nombre de lignes :** 1682 | **Nombre de colonnes :** 24")
+        st.write("**Exemple de données :**")
+        st.dataframe(df.head())
+
+        st.write("""
+        - **Genres les plus courants :**  
+          - 🎭 Drama (725 films)  
+          - 😂 Comedy (505 films)  
+          - 🔥 Action / Thriller (251 films chacun)  
+          - ❓ Genres rares : Fantasy (22 films), Western (27 films)
+        - **Nombre de titres uniques :** 1664  
+        - **Dates de sortie manquantes :** 1  
+        """)
+
+    with st.expander("📌 **Données Ratings**"):
+        st.write("**Nombre total de lignes :** 100 000 | **Nombre de colonnes :** 4")
+        st.write("""
+        - **Notes aberrantes détectées :** 6 110  
+        - **Nombre d’utilisateurs ayant donné plusieurs notes :** 99 057  
+        - **Films ayant plusieurs notes :** 98 318  
+        - **Valeurs manquantes :** 0  
+        """)
+
+# 🛠 **3️⃣ Nettoyage des Données**
+elif page == "🛠 Nettoyage des Données":
+    st.header("🛠 Nettoyage des Données")
+    st.write("Nous avons appliqué plusieurs étapes de nettoyage avant d'exploiter les données.")
+
+    with st.expander("📌 **Principales étapes du nettoyage**"):
+        st.write("""
+        1️⃣ **Suppression des valeurs manquantes**
+        2️⃣ **Conversion des types de données (dates, entiers, etc.)**
+        3️⃣ **Filtrage des notes aberrantes**
+        4️⃣ **Fusion des fichiers movies.csv et ratings.csv**
+        """)
+
+    st.write("**Aperçu des données nettoyées :**")
+    st.dataframe(df.head())
+
+# 📈 **4️⃣ Analyse Exploratoire**
+elif page == "📈 Analyse Exploratoire":
+    st.header("📈 Analyse Exploratoire")
+
+    tab1, tab2, tab3, tab4 = st.tabs(["🔢 Notes", "📅 Films par Année", "📌 Genres", "👤 Utilisateurs"])
 
     with tab1:
         st.subheader("📌 Distribution des Notes")
@@ -72,19 +107,14 @@ if section == "📊 Analyse Exploratoire":
 
     with tab2:
         st.subheader("📌 Nombre de Films par Année")
-        df["release_date"] = pd.to_datetime(df["release_date"], errors="coerce")
-        df["year"] = df["release_date"].dt.year
+        df["year"] = pd.to_datetime(df["release_date"], errors="coerce").dt.year
         fig, ax = plt.subplots(figsize=(12,5))
         df["year"].value_counts().sort_index().plot(kind="bar", ax=ax, color="orange")
-        plt.xlabel("Année")
-        plt.ylabel("Nombre de Films")
         st.pyplot(fig)
 
     with tab3:
-        st.subheader("📌 Heatmap des Corrélations entre Genres")
-        genres = ['Action', 'Adventure', 'Animation', "Children's", 'Comedy', 'Crime',
-                  'Documentary', 'Drama', 'Fantasy', 'Film-Noir', 'Horror', 'Musical',
-                  'Mystery', 'Romance', 'Sci-Fi', 'Thriller', 'War', 'Western']
+        st.subheader("📌 Heatmap des Genres")
+        genres = ['Action', 'Adventure', 'Drama', 'Comedy', 'Thriller']
         fig, ax = plt.subplots(figsize=(10,8))
         sns.heatmap(df[genres].corr(), annot=False, cmap="coolwarm", ax=ax)
         st.pyplot(fig)
@@ -94,56 +124,36 @@ if section == "📊 Analyse Exploratoire":
         user_ratings = df["user_id"].value_counts()
         fig, ax = plt.subplots(figsize=(10,5))
         sns.histplot(user_ratings, bins=50, kde=True, ax=ax, color="purple")
-        plt.xlabel("Nombre de Films Notés")
-        plt.ylabel("Nombre d'Utilisateurs")
         st.pyplot(fig)
 
-# 🎬 3️⃣ Recommandations Interactives
-elif section == "🎬 Recommandations":
+# 🎬 **5️⃣ Recommandations**
+elif page == "🎬 Recommandations":
     st.header("🎬 Recommandations Personnalisées")
 
     user_id = st.number_input("🔹 **Entrez un User ID** :", min_value=1, max_value=1000, step=1)
 
     if st.button("🎥 Obtenir des Recommandations"):
         user_item_matrix = df.pivot_table(index="user_id", columns="movie_title", values="rating", fill_value=0)
-
-        # Modèle Item-Item KNN
         knn = NearestNeighbors(n_neighbors=10, metric="manhattan", algorithm="ball_tree")
         knn.fit(user_item_matrix.T.values)
 
-        # Fonction pour recommandations
         def get_recommendations(user_id, user_item_matrix, knn, top_n=5):
             unrated_movies = user_item_matrix.columns[user_item_matrix.loc[user_id] == 0]
-            predictions = {}
-            for movie in unrated_movies:
-                pred = np.mean(user_item_matrix.loc[user_id])
-                predictions[movie] = pred
+            predictions = {movie: np.mean(user_item_matrix.loc[user_id]) for movie in unrated_movies}
             return sorted(predictions.items(), key=lambda x: x[1], reverse=True)[:top_n]
 
         recommendations = get_recommendations(user_id, user_item_matrix, knn)
-        st.subheader(f"🎥 **Films Recommandés pour l'Utilisateur {user_id}** :")
         for movie, score in recommendations:
             st.write(f"🎬 {movie} (Score: {score:.2f})")
 
-# 📈 4️⃣ Performance des Modèles
-elif section == "📈 Performance des Modèles":
-    st.header("📈 Comparaison des Modèles de Recommandation")
+# 🚀 **6️⃣ Performance des Modèles**
+elif page == "🚀 Performance des Modèles":
+    st.header("🚀 Comparaison des Modèles de Recommandation")
 
-    # Comparaison des RMSE
     models = ["User-User KNN", "Item-Item KNN", "Content-Based", "Hybrid Content-User", "Hybrid Content-Item"]
     rmse_values = [1.112, 0.496, 1.266, 3.115, 2.370]  
 
     fig, ax = plt.subplots(figsize=(8,5))
     sns.barplot(x=models, y=rmse_values, ax=ax, palette="viridis")
-    plt.xlabel("Modèles")
-    plt.ylabel("RMSE (Erreur Moyenne)")
     plt.xticks(rotation=15)
     st.pyplot(fig)
-
-    st.markdown("""
-    📌 **Analyse des résultats :**
-    - ✅ **Item-Item KNN est le plus performant** avec un **RMSE de 0.496**.
-    - 📉 **Le modèle hybride Content-User est le moins performant** (RMSE = 3.115).
-    - 🎯 **Les approches collaboratives donnent de meilleurs résultats** que le filtrage basé uniquement sur le contenu.
-    """)
-
