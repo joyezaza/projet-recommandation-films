@@ -4,13 +4,20 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.neighbors import NearestNeighbors
 import numpy as np
+import os
 
 # 🎨 Configuration du Dashboard
 st.set_page_config(page_title="Dashboard Recommandation de Films", layout="wide")
 
-# 📂 Chargement des données
-DATA_PATH = "C:/projet_work/Data-source/merged_final_data.csv"
-df = pd.read_csv(DATA_PATH)
+# 📂 Chargement des données avec chemin relatif
+DATA_PATH = os.path.join(os.path.dirname(__file__), "../Data-source/merged_final_data.csv")
+
+# Vérifier si le fichier existe avant de le charger
+if os.path.exists(DATA_PATH):
+    df = pd.read_csv(DATA_PATH)
+else:
+    st.error(f"❌ Fichier introuvable : `{DATA_PATH}`. Vérifiez votre dépôt GitHub.")
+    st.stop()
 
 # 📌1️⃣ Introduction & Objectifs
 st.title("🎬 Dashboard - Système de Recommandation de Films")
@@ -139,3 +146,4 @@ elif section == "📈 Performance des Modèles":
     - 📉 **Le modèle hybride Content-User est le moins performant** (RMSE = 3.115).
     - 🎯 **Les approches collaboratives donnent de meilleurs résultats** que le filtrage basé uniquement sur le contenu.
     """)
+
