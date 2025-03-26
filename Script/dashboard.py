@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.neighbors import NearestNeighbors
 import numpy as np
+import os
 
 # 🎨 Configuration du Dashboard
 st.set_page_config(page_title="Dashboard Recommandation de Films", layout="wide")
